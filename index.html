@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Web Sheet – Google Sheets Clone</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- SweetAlert2 CSS for nicer alerts -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-3">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold neon-text" href="#">Advanced Web Sheet</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+              aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Additional nav links if needed -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toolbar -->
+  <div class="container-fluid mb-3">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <!-- Formatting buttons -->
+      <button id="boldBtn" class="btn btn-outline-secondary" title="Bold">
+        <i class="bi bi-type-bold"></i>
+      </button>
+      <button id="italicBtn" class="btn btn-outline-secondary" title="Italic">
+        <i class="bi bi-type-italic"></i>
+      </button>
+      <button id="underlineBtn" class="btn btn-outline-secondary" title="Underline">
+        <i class="bi bi-type-underline"></i>
+      </button>
+      <select id="fontSizeSelect" class="form-select w-auto">
+        <option value="12px">12</option>
+        <option value="14px">14</option>
+        <option value="16px">16</option>
+        <option value="18px">18</option>
+        <option value="20px">20</option>
+      </select>
+      <input type="color" id="fontColorPicker" class="form-control form-control-color" title="Font Color" />
+
+      <!-- Grid manipulation buttons -->
+      <button onclick="addRow()" class="btn btn-outline-primary" title="Add Row">
+        <i class="bi bi-plus-circle"></i> Add Row
+      </button>
+      <button onclick="addColumn()" class="btn btn-outline-primary" title="Add Column">
+        <i class="bi bi-plus-circle"></i> Add Column
+      </button>
+      <button onclick="confirmDeleteRow()" class="btn btn-outline-danger" title="Delete Selected Row">
+        <i class="bi bi-dash-circle"></i> Delete Row
+      </button>
+      <button onclick="confirmDeleteColumn()" class="btn btn-outline-danger" title="Delete Selected Column">
+        <i class="bi bi-dash-circle"></i> Delete Column
+      </button>
+      <button onclick="removeDuplicates()" class="btn btn-outline-warning" title="Remove Duplicate Rows">
+        <i class="bi bi-arrows-collapse"></i> Remove Duplicates
+      </button>
+      <button onclick="saveSheet()" class="btn btn-outline-success" title="Save Sheet">
+        <i class="bi bi-save"></i> Save
+      </button>
+      <button onclick="loadSheet()" class="btn btn-outline-info" title="Load Sheet">
+        <i class="bi bi-folder2-open"></i> Load
+      </button>
+      <!-- Formula Palette Button -->
+      <button id="formulaPaletteBtn" class="btn btn-outline-secondary" title="Show Formula Palette">
+        <i class="bi bi-collection"></i> Formula Palette
+      </button>
+      <!-- Dark Mode Toggle (Requires additional JS for functionality) -->
+      <button id="darkModeToggle" class="btn btn-outline-secondary ms-auto">
+        Dark Mode
+      </button>
+      <!-- Find and Replace -->
+      <input type="text" id="findText" class="form-control w-auto" placeholder="Find" />
+      <input type="text" id="replaceText" class="form-control w-auto" placeholder="Replace" />
+      <button onclick="findAndReplace()" class="btn btn-outline-warning" title="Find & Replace">
+        <i class="bi bi-search"></i> Replace
+      </button>
+      <!-- Excel Upload Button -->
+      <button id="uploadExcelBtn" class="btn btn-outline-info" title="Upload Excel">
+        <i class="bi bi-upload"></i> Upload Excel
+      </button>
+      <!-- Hidden File Input for Excel Upload -->
+      <input type="file" id="excelUpload" accept=".xlsx, .xls" style="display: none;" />
+    </div>
+  </div>
+
+  <!-- Formula Bar -->
+  <div class="container-fluid mb-3">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-calculator"></i></span>
+      <input type="text" id="formulaBar" class="form-control" placeholder="Enter formula (e.g. =SUM(A1:A5) or =CLEAR())" />
+    </div>
+  </div>
+
+  <!-- Spreadsheet Container -->
+  <div class="container-fluid">
+    <div id="sheetContainer" class="table-responsive shadow-sm">
+      <table id="sheetTable" class="table table-bordered table-hover">
+        <thead>
+          <tr id="columnHeader">
+            <th class="bg-light"></th>
+            <!-- Column headers are generated dynamically -->
+          </tr>
+        </thead>
+        <tbody id="sheetBody">
+          <!-- Rows and cells are generated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chart Visualization Canvas -->
+  <div class="container-fluid mt-3">
+    <canvas id="chartCanvas" style="max-width: 100%; height: 300px;"></canvas>
+  </div>
+
+  <!-- Formula Palette Modal -->
+  <div class="modal fade" id="formulaModal" tabindex="-1" aria-labelledby="formulaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formulaModalLabel">Formula Palette</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- List of built-in formulas -->
+          <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=SUM(A1:A10)">=SUM(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=AVERAGE(A1:A10)">=AVERAGE(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=MAX(A1:A10)">=MAX(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=MIN(A1:A10)">=MIN(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=COUNT(A1:A10)">=COUNT(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=MEDIAN(A1:A10)">=MEDIAN(A1:A10)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=TRIM(A1)">=TRIM(A1)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=UPPER(A1)">=UPPER(A1)</button>
+            <button type="button" class="list-group-item list-group-item-action formula-btn" data-formula="=LOWER(A1)">=LOWER(A1)</button>
+            <!-- Additional formulas can be added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <!-- Bootstrap JS Bundle (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+  <!-- SheetJS (for Excel upload) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx"></script>
+  <!-- Chart.js (for data visualization) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+
+  <!-- Footer Section -->
+<footer class="text-center mt-4 mb-4">
+    <p>This is developed by Gadidamalla Thangella on 28th February 2025</p>
+    <div>
+        <a href="https://www.linkedin.com/in/gthangella/" target="_blank" class="btn btn-link">
+            <i class="bi bi-linkedin"></i> https://www.linkedin.com/in/gthangella/
+        </a>
+        <span class="mx-2">|</span>
+        <a href="mailto:imgtk17@gmail.com" class="btn btn-link">
+            <i class="bi bi-envelope"></i> imgtk17@gmail.com
+        </a>
+    </div>
+</footer>
+
+
+
+  <!-- Trigger file input when clicking the Excel upload button -->
+  <script>
+    document.getElementById('uploadExcelBtn').addEventListener('click', function () {
+      document.getElementById('excelUpload').click();
+    });
+  </script>
+</body>
+</html>

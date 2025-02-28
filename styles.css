@@ -1,0 +1,117 @@
+/* styles.css */
+
+/* Overall page styling */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Sheet container styling */
+#sheetContainer {
+  margin-top: 20px;
+  max-height: calc(100vh - 300px);
+  overflow: auto;
+}
+
+/* Table cells and headers styling */
+table td,
+table th {
+  vertical-align: middle;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+}
+
+/* Hide fill handle by default */
+.fill-handle {
+  width: 8px;
+  height: 8px;
+  background: #0d6efd;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  border-radius: 50%;
+  cursor: crosshair;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Show fill handle on cell hover or when selected */
+td:hover .fill-handle,
+td.selected .fill-handle {
+  opacity: 0.8;
+}
+
+/* Focus effect on cells */
+table td:focus {
+  outline: none;
+  background-color: #e9f5ff;
+}
+
+/* Selected cell highlight */
+table td.selected {
+  border: 2px solid #0d6efd;
+}
+
+/* Column resize handle styling */
+.col-resize {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+}
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+
+/* Ensure containers (like .container-fluid) use a dark background */
+body.dark-mode .container-fluid {
+  background-color: #121212 !important;
+}
+
+/* Navbar and modal content */
+body.dark-mode .navbar,
+body.dark-mode .modal-content {
+  background-color: #1f1f1f !important;
+}
+
+/* Table, table header, and table cells */
+body.dark-mode .table,
+body.dark-mode .table thead,
+body.dark-mode .table tbody,
+body.dark-mode .table th,
+body.dark-mode .table td {
+  background-color: #1f1f1f !important;
+  color: #ffffff !important;
+  border-color: #333 !important;
+}
+
+/* Optional: Adjust button styles in dark mode */
+body.dark-mode .btn-outline-secondary,
+body.dark-mode .btn-outline-primary,
+body.dark-mode .btn-outline-danger,
+body.dark-mode .btn-outline-warning,
+body.dark-mode .btn-outline-success,
+body.dark-mode .btn-outline-info {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+.neon-text {
+  color: #FF0000; /* Red text color */
+  text-shadow: 
+    0 0 1px #FFFFFF,  /* Subtle white glow */
+    0 0 2px #FFFFFF,  /* Slightly larger white glow */
+    0 0 3px #FFFFFF;  /* A little more glow around the text */
+  transition: all 0.3s ease-in-out;
+}
+
+.neon-text:hover {
+  color: #FF0000; /* Red stays the same on hover */
+  text-shadow: 
+    0 0 1px #FFFFFF, 
+    0 0 2px #FFFFFF, 
+    0 0 3px #FFFFFF;  /* Subtle glow on hover */
+}
